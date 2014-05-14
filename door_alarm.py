@@ -3,8 +3,8 @@ import time
 
 SENSOR_PIN = 'P9_40'
 DOOR_CLOSED_DETECTION_PERIOD_SECS = 2
-SENSOR_SAMPLE_FREQUENCY = 0.1
-DOOR_CLOSED_SAMPLES = DOOR_CLOSED_DETECTION_PERIOD_SECS * (1/SENSOR_SAMPLE_FREQUENCY)
+SAMPLE_FREQUENCY = 0.1
+DOOR_CLOSED_SAMPLES = DOOR_CLOSED_DETECTION_PERIOD_SECS * (1/SAMPLE_FREQUENCY)
 SENSOR_THRESHOLD = 0.1
 
 def monitor_sensor():
@@ -27,6 +27,6 @@ def monitor_sensor():
                     closed_samples_counter = 0
             else:
                 closed_samples_counter = 0
-        time.sleep(SENSOR_SAMPLE_FREQUENCY)
+        time.sleep(SAMPLE_FREQUENCY)
 
 monitor_sensor()
