@@ -10,10 +10,10 @@ DOOR_CLOSED_SAMPLES = DOOR_CLOSED_DETECTION_PERIOD_SECS * (1/SAMPLE_FREQUENCY)
 SENSOR_THRESHOLD = 0.1
 
 def post_to_twitter(msg):
-    api = twitter.Api(consumer_key=CONSUMER_KEY,
-                      consumer_secret=CONSUMER_SECRET,
-                      access_token_key=ACCESS_TOKEN_KEY,
-                      access_token_secret=ACCESS_TOKEN_SECRET)
+    api = twitter.Api(consumer_key=settings.CONSUMER_KEY,
+                      consumer_secret=settings.CONSUMER_SECRET,
+                      access_token_key=settings.ACCESS_TOKEN_KEY,
+                      access_token_secret=settings.ACCESS_TOKEN_SECRET)
     print api.VerifyCredentials()
 
 def monitor_sensor():
