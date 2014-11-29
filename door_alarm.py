@@ -2,7 +2,21 @@ import Adafruit_BBIO.ADC as ADC
 import time
 import twitter
 import settings
-from subprocess import call
+import logging
+
+# create logger
+logger = logging.getLogger('door_alarm')
+logger.setLevel(logging.DEBUG)
+
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(ch)
 
 SENSOR_PIN = 'P9_40'
 DOOR_CLOSED_DETECTION_PERIOD_SECS = 2 
@@ -12,21 +26,28 @@ SENSOR_THRESHOLD = 0.8
 
 def post_to_twitter(msg):
     """Send a personal message to Twitter"""
-    api = twitter.Api(consumer_key=settings.CONSUMER_KEY,
-                      consumer_secret=settings.CONSUMER_SECRET,
-                      access_token_key=settings.ACCESS_TOKEN_KEY,
-                      access_token_secret=settings.ACCESS_TOKEN_SECRET)
-    api.PostDirectMessage(text=msg,
-                          screen_name=settings.TWITTER_SCREEN_NAME)
+    try:
+        api = twitter.Api(consumer_key=settings.CONSUMER_KEY,
+                          consumer_secret=settings.CONSUMER_SECRET,
+                          access_token_key=settings.ACCESS_TOKEN_KEY,
+                          access_token_secret=settings.ACCESS_TOKEN_SECRET)
+        api.PostDirectMessage(text=msg,
+                              screen_name=settings.TWITTER_SCREEN_NAME)
+    except twitter.TwitterError as e:
+        logger.error("Twitter error: {0}".format(e))
 
 def monitor_sensor():
     """Read the sensor value and detect an alarm condition."""
 
-    print "Starting to monitor sensor"
+    logger.info("Starting to monitor sensor")
     post_to_twitter("Door Entry Alarm: started")
     ADC.setup()
 
+    # start with door in closed state
     is_open = False
+    logger.info("Door closed")
+    post_to_twitter("Door closed")
+
     samples_counter = 0
     while True:
         reading = ADC.read(SENSOR_PIN)
@@ -35,7 +56,7 @@ def monitor_sensor():
                 samples_counter += 1
                 if samples_counter >= SAMPLES_REQUIRED:
                     is_open = True
-                    print "Door opened"
+                    logger.info("Door opened")
                     post_to_twitter("Door opened")
                     samples_counter = 0
             else:
@@ -43,7 +64,7 @@ def monitor_sensor():
         elif is_open == True:
             if reading <= SENSOR_THRESHOLD:
                 is_open = False
-                print "Door closed"
+                logger.info("Door closed")
                 post_to_twitter("Door closed")
                 samples_counter = 0
         time.sleep(SAMPLE_FREQUENCY)
