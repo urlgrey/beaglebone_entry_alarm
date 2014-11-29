@@ -4,19 +4,13 @@ import twitter
 import settings
 import logging
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    filename=settings.LOG_FILE)
+
 # create logger
 logger = logging.getLogger('door_alarm')
-logger.setLevel(logging.DEBUG)
-
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-# add the handlers to the logger
-logger.addHandler(ch)
+logger.setLevel(logging.INFO)
 
 SENSOR_PIN = 'P9_40'
 DOOR_CLOSED_DETECTION_PERIOD_SECS = 2 
